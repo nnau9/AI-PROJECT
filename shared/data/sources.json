@@ -1,0 +1,298 @@
+{
+  "meta": {
+    "description": "Реестр источников. Каждый факт в остальных JSON ссылается сюда по id. status: ok — страница прочитана; blocked — сервер отказал в доступе при проверке; not_reviewed — ссылка найдена на официальной странице, но содержимое не разбиралось; partial — прочитана частично.",
+    "lastReviewAt": "2026-11-11"
+  },
+  "sources": [
+    {
+      "id": "bridgeusa-swt",
+      "title": "BridgeUSA — Summer Work Travel (страница программы)",
+      "publisher": "U.S. Department of State, BridgeUSA",
+      "url": "https://j1visa.state.gov/programs/summer-work-travel/",
+      "kind": "official",
+      "status": "ok",
+      "checkedAt": "2026-11-11",
+      "note": "Цели программы, требования к участникам, длительность, запрещённые виды работ, обязанности спонсоров. На 11.11.2026 страница всё ещё ссылается на календарь 2024 года; актуальный календарь 2026 — на странице ресурсов."
+    },
+    {
+      "id": "bridgeusa-swt-resources",
+      "title": "BridgeUSA — Summer Work Travel Resource Page",
+      "publisher": "U.S. Department of State, BridgeUSA",
+      "url": "https://j1visa.state.gov/summer-work-travel-resource-page/",
+      "kind": "official",
+      "status": "ok",
+      "checkedAt": "2026-11-11",
+      "note": "Ссылки на календарь программы 2026, памятку о правах, форму инцидента, нормативные тексты eCFR."
+    },
+    {
+      "id": "bridgeusa-common-questions",
+      "title": "BridgeUSA — Common Questions (частые вопросы участников)",
+      "publisher": "U.S. Department of State, BridgeUSA",
+      "url": "https://j1visa.state.gov/participants/common-questions/",
+      "kind": "official",
+      "status": "ok",
+      "checkedAt": "2026-11-11",
+      "note": "30-дневный период до начала и после окончания программы; деятельность только с одобрения спонсора."
+    },
+    {
+      "id": "bridgeusa-contacts",
+      "title": "BridgeUSA — Contacts (горячая линия J-1)",
+      "publisher": "U.S. Department of State, BridgeUSA",
+      "url": "https://j1visa.state.gov/contacts/",
+      "kind": "official",
+      "status": "ok",
+      "checkedAt": "2026-11-11",
+      "note": "Круглосуточная горячая линия 1-866-283-9090, jvisas@state.gov, линия против торговли людьми."
+    },
+    {
+      "id": "bridgeusa-sponsors-swt",
+      "title": "BridgeUSA — Designated Sponsor List By Country (категория Summer Work Travel)",
+      "publisher": "U.S. Department of State, BridgeUSA",
+      "url": "https://j1visa.state.gov/sponsors/sponsor-by-country/?program=Summer%20Work%20Travel",
+      "kind": "official",
+      "status": "partial",
+      "checkedAt": "2026-11-11",
+      "note": "Таблица озаглавлена «Designated Sponsor List By Country 2024» и отражает страны гражданства участников за предыдущий календарный год. Наличие Казахстана в строке спонсора означает, что спонсор принимал граждан Казахстана, а не то, что у него есть офис в Казахстане. Последние ~3% таблицы не сверены дословно."
+    },
+    {
+      "id": "bridgeusa-sponsor-search",
+      "title": "BridgeUSA — поиск спонсора (Sponsor Search)",
+      "publisher": "U.S. Department of State, BridgeUSA",
+      "url": "https://j1visa.state.gov/participants/how-to-apply/sponsor-search/",
+      "kind": "official",
+      "status": "partial",
+      "checkedAt": "2026-11-11",
+      "note": "Используйте для самостоятельной проверки текущего статуса спонсора."
+    },
+    {
+      "id": "bridgeusa-date-chart-2026",
+      "title": "BridgeUSA — 2026 Summer Work Travel Program Date Chart (PDF)",
+      "publisher": "U.S. Department of State, BridgeUSA",
+      "url": "https://j1visa.state.gov/wp-content/uploads/2026/07/2026_SWT-Program-Date-Chart.pdf",
+      "kind": "official",
+      "status": "not_reviewed",
+      "checkedAt": "2026-11-11",
+      "note": "Официальные окна программы по странам. Даты для Казахстана в контент не перенесены — нужна сверка."
+    },
+    {
+      "id": "bridgeusa-wilberforce",
+      "title": "Know Your Rights — Wilberforce Pamphlet (PDF)",
+      "publisher": "U.S. Department of State",
+      "url": "https://j1visa.state.gov/wp-content/uploads/2025/04/Updated-Wilberforce-Know-Your-Rights-Pamphlet-PDF-version-1.pdf",
+      "kind": "official",
+      "status": "not_reviewed",
+      "checkedAt": "2026-11-11",
+      "note": "Памятка о правах временных работников; ссылка опубликована на странице ресурсов SWT."
+    },
+    {
+      "id": "ecfr-22-62",
+      "title": "eCFR — 22 CFR Part 62 (правила программ обмена J-1)",
+      "publisher": "U.S. Government Publishing Office",
+      "url": "https://www.ecfr.gov/current/title-22/chapter-I/subchapter-G/part-62",
+      "kind": "official",
+      "status": "not_reviewed",
+      "checkedAt": "2026-11-11",
+      "note": "Нормативный текст. Требования к страховке (§62.14) и к SWT (§62.32) в контент дословно не переносились."
+    },
+    {
+      "id": "tsg-exchange",
+      "title": "travel.state.gov — Exchange Visitor Visa",
+      "publisher": "U.S. Department of State, Bureau of Consular Affairs",
+      "url": "https://travel.state.gov/content/travel/en/us-visas/study/exchange.html",
+      "kind": "official",
+      "status": "blocked",
+      "checkedAt": "2026-11-11",
+      "note": "При автоматической проверке сервер вернул HTTP 403 (повторно 11.11.2026). Порядок подачи нужно сверить вручную в браузере."
+    },
+    {
+      "id": "tsg-ds160",
+      "title": "travel.state.gov — DS-160: Online Nonimmigrant Visa Application",
+      "publisher": "U.S. Department of State, Bureau of Consular Affairs",
+      "url": "https://travel.state.gov/content/travel/en/us-visas/visa-information-resources/forms/ds-160-online-nonimmigrant-visa-application.html",
+      "kind": "official",
+      "status": "blocked",
+      "checkedAt": "2026-11-11",
+      "note": "HTTP 403 при автоматической проверке (повторно 11.11.2026). Сверьте вручную."
+    },
+    {
+      "id": "tsg-fees",
+      "title": "travel.state.gov — Fees for Visa Services",
+      "publisher": "U.S. Department of State, Bureau of Consular Affairs",
+      "url": "https://travel.state.gov/content/travel/en/us-visas/visa-information-resources/fees/fees-visa-services.html",
+      "kind": "official",
+      "status": "blocked",
+      "checkedAt": "2026-11-11",
+      "note": "HTTP 403 при автоматической проверке (повторно 11.11.2026). Размер визового сбора не подтверждён."
+    },
+    {
+      "id": "kz-embassy-visas",
+      "title": "Посольство США в Казахстане — Visas",
+      "publisher": "U.S. Embassy & Consulate in Kazakhstan",
+      "url": "https://kz.usembassy.gov/visas/",
+      "kind": "official",
+      "status": "blocked",
+      "checkedAt": "2026-11-11",
+      "note": "HTTP 403 при автоматической проверке (повторно 11.11.2026). Место подачи и система записи не подтверждены."
+    },
+    {
+      "id": "ice-sevis-i901",
+      "title": "ICE — I-901 SEVIS Fee",
+      "publisher": "U.S. Immigration and Customs Enforcement",
+      "url": "https://www.ice.gov/sevis/i901",
+      "kind": "official",
+      "status": "ok",
+      "checkedAt": "2026-11-11",
+      "note": "Страница обновлена 12/10/2024. Таблица: J (полная оплата) — $220; special J-visa categories (subsidized) — $35. Отнесение SWT к льготной категории на странице прямо не указано."
+    },
+    {
+      "id": "dhs-rule-2026",
+      "title": "Federal Register — Establishing a Fixed Time Period of Admission… (финальное правило DHS, 17.07.2026)",
+      "publisher": "U.S. Department of Homeland Security",
+      "url": "https://www.federalregister.gov/public-inspection/2026-14439/establishing-a-fixed-time-period-of-admission-and-an-extension-of-stay-procedure-for-nonimmigrant",
+      "kind": "official",
+      "status": "not_reviewed",
+      "checkedAt": "2026-11-11",
+      "note": "Упомянуто на странице ICE. Может влиять на сроки допуска для J-1; содержание не разбиралось."
+    },
+    {
+      "id": "apple-fonts",
+      "title": "Apple Developer — Fonts (лицензия SF Pro)",
+      "publisher": "Apple",
+      "url": "https://developer.apple.com/fonts/",
+      "kind": "design",
+      "status": "ok",
+      "checkedAt": "2026-11-11",
+      "note": "Лицензия разрешает шрифт только для макетов интерфейсов под платформы Apple и запрещает встраивание и использование в контенте сайтов. Поэтому сайт использует системный стек шрифтов."
+    },
+    {
+      "id": "apple-hig",
+      "title": "Apple Human Interface Guidelines",
+      "publisher": "Apple",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/",
+      "kind": "design",
+      "status": "partial",
+      "checkedAt": "2026-11-11",
+      "note": "Использовано только как визуальный ориентир (ясность, отступы, крупная типографика). Конкретные числа из HIG не цитируются."
+    },
+    {
+      "id": "kcet-home",
+      "title": "KCET — главная",
+      "publisher": "KCET",
+      "url": "https://www.kcet.kz/",
+      "kind": "agency",
+      "status": "ok",
+      "checkedAt": "2026-11-11",
+      "note": ""
+    },
+    {
+      "id": "kcet-company",
+      "title": "KCET — о компании",
+      "publisher": "KCET",
+      "url": "https://www.kcet.kz/company/",
+      "kind": "agency",
+      "status": "ok",
+      "checkedAt": "2026-11-11",
+      "note": "Цена «от 1685 $» без сезона и состава."
+    },
+    {
+      "id": "kcet-contacts",
+      "title": "KCET — контакты",
+      "publisher": "KCET",
+      "url": "https://www.kcet.kz/contacts/",
+      "kind": "agency",
+      "status": "ok",
+      "checkedAt": "2026-11-11",
+      "note": ""
+    },
+    {
+      "id": "kcet-new",
+      "title": "new.kcet.kz",
+      "publisher": "KCET",
+      "url": "https://new.kcet.kz/",
+      "kind": "agency",
+      "status": "blocked",
+      "checkedAt": "2026-11-11",
+      "note": "Ошибка TLS: сертификат выдан на kcet.kz и www.kcet.kz, не на new.kcet.kz."
+    },
+    {
+      "id": "abc-home",
+      "title": "ABC Universe — workandtravelus.kz",
+      "publisher": "ABC Universe",
+      "url": "https://workandtravelus.kz/",
+      "kind": "agency",
+      "status": "ok",
+      "checkedAt": "2026-11-11",
+      "note": ""
+    },
+    {
+      "id": "iec-astana",
+      "title": "Центр Международного Обмена — контакты Астана",
+      "publisher": "IEC / ЦМО",
+      "url": "https://workandtravel.com/ru/contacts/astana/",
+      "kind": "agency",
+      "status": "ok",
+      "checkedAt": "2026-11-11",
+      "note": "В подвале страницы Астаны указан Instagram iec.workandtravel; ссылка iec.kazakhstan — на странице Алматы."
+    },
+    {
+      "id": "iec-almaty",
+      "title": "Центр Международного Обмена — контакты Алматы",
+      "publisher": "IEC / ЦМО",
+      "url": "https://workandtravel.com/ru/contacts/almaty/",
+      "kind": "agency",
+      "status": "ok",
+      "checkedAt": "2026-11-11",
+      "note": ""
+    },
+    {
+      "id": "iec-about",
+      "title": "Центр Международного Обмена — о нас",
+      "publisher": "IEC / ЦМО",
+      "url": "https://workandtravel.com/ru/about/",
+      "kind": "agency",
+      "status": "ok",
+      "checkedAt": "2026-11-11",
+      "note": ""
+    },
+    {
+      "id": "americantrip-home",
+      "title": "American Trip — главная",
+      "publisher": "American Trip",
+      "url": "https://americantrip.kz/",
+      "kind": "agency",
+      "status": "ok",
+      "checkedAt": "2026-11-11",
+      "note": ""
+    },
+    {
+      "id": "watusa-home",
+      "title": "Work and Travel USA Kazakhstan — главная",
+      "publisher": "Opportunity Group",
+      "url": "https://www.workandtravelusa.kz/",
+      "kind": "agency",
+      "status": "ok",
+      "checkedAt": "2026-11-11",
+      "note": ""
+    },
+    {
+      "id": "watusa-contacts",
+      "title": "Work and Travel USA Kazakhstan — контакты",
+      "publisher": "Opportunity Group",
+      "url": "https://www.workandtravelusa.kz/contacts",
+      "kind": "agency",
+      "status": "ok",
+      "checkedAt": "2026-11-11",
+      "note": ""
+    },
+    {
+      "id": "watusa-programs",
+      "title": "Work and Travel USA Kazakhstan — программы и цены",
+      "publisher": "Opportunity Group",
+      "url": "https://www.workandtravelusa.kz/programs",
+      "kind": "agency",
+      "status": "ok",
+      "checkedAt": "2026-11-11",
+      "note": "Цены на странице датированы 2025 годом; страница указывает, что не является публичной офертой."
+    }
+  ]
+}

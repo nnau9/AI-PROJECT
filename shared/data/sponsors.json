@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "description": "Американские назначенные спонсоры J-1, в строке которых для категории Summer Work Travel указан Казахстан. Таблица BridgeUSA озаглавлена «Designated Sponsor List By Country 2024» и отражает страны гражданства участников за предыдущий календарный год. Это не подтверждает текущий статус назначения, наличие офиса в Казахстане или качество местных агентств. Перед подписанием договора проверяйте спонсора в Sponsor Search.",
+    "sourceId": "bridgeusa-sponsors-swt",
+    "verifiedAt": "2026-11-11",
+    "listLabel": "Designated Sponsor List By Country 2024, категория Summer Work Travel"
+  },
+  "sponsors": [
+    { "id": "alliance-abroad-lp", "officialName": "Alliance Abroad Group, L.P.", "shortName": "Alliance Abroad Group", "listedForKazakhstan": true },
+    { "id": "american-work-adventures", "officialName": "American Work Adventures, Inc.", "shortName": "American Work Adventures", "listedForKazakhstan": true },
+    { "id": "american-work-experience", "officialName": "American Work Experience", "shortName": "American Work Experience", "listedForKazakhstan": true },
+    { "id": "ciee-inc", "officialName": "CIEE, Inc.", "shortName": "CIEE", "listedForKazakhstan": true },
+    { "id": "ccusa-weusa", "officialName": "Camp Counselors USA/Work Experience USA", "shortName": "CCUSA / Work Experience USA", "listedForKazakhstan": true },
+    { "id": "chi", "officialName": "Cultural Homestay International (CHI)", "shortName": "CHI", "listedForKazakhstan": true },
+    { "id": "erdt", "officialName": "Educational Resource Development Trust", "shortName": "ERDT", "listedForKazakhstan": true },
+    { "id": "gec", "officialName": "Global Educational Concepts, Inc.", "shortName": "Global Educational Concepts", "listedForKazakhstan": true },
+    { "id": "geovisions", "officialName": "GeoVisions", "shortName": "GeoVisions", "listedForKazakhstan": true },
+    { "id": "greenheart", "officialName": "Greenheart Exchange", "shortName": "Greenheart Exchange", "listedForKazakhstan": true },
+    { "id": "interexchange-inc", "officialName": "InterExchange,Inc.", "shortName": "InterExchange", "listedForKazakhstan": true },
+    { "id": "intrax-work-travel", "officialName": "Intrax Work/Travel", "shortName": "Intrax Work/Travel", "listedForKazakhstan": true },
+    { "id": "signature-services", "officialName": "Signature Services Corporation", "shortName": "Signature Services", "listedForKazakhstan": true },
+    { "id": "spirit-inc", "officialName": "Spirit Cultural Exchange, Inc.", "shortName": "Spirit Cultural Exchange", "listedForKazakhstan": true },
+    { "id": "united-work-travel", "officialName": "United Work and Travel, a Division of APEI", "shortName": "United Work and Travel", "listedForKazakhstan": true }
+  ]
+}

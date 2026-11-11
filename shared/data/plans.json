@@ -1,0 +1,63 @@
+{
+  "meta": {
+    "brand": "NNATO",
+    "period": "год",
+    "priceSource": "Прайс NNATO",
+    "priceSetAt": "2026-11-11",
+    "periodExplanation": "Цена указана за 12 месяцев подписки NNATO. Дата начала периода, порядок оплаты и условия возврата фиксируются в договоре-оферте.",
+    "paymentNote": "Оплата на сайте пока не подключена — оставьте заявку, и мы свяжемся с вами.",
+    "notIncluded": "Стоимость подписки NNATO не включает расходы на саму программу Work and Travel: услуги агентства и спонсора J-1, SEVIS, визовый сбор, авиабилеты, страховку, жильё и проживание. Подписка не гарантирует участие в программе, оффер или визу."
+  },
+  "features": [
+    { "id": "guide", "title": "Гайд по шагам от подачи заявки до поездки в США" },
+    { "id": "checklists", "title": "Чек-листы и материалы по этапам" },
+    { "id": "agency-table", "title": "Сравнительная таблица агентств с понятными критериями и ссылками на источники" },
+    { "id": "curator-group", "title": "Общая группа с куратором на протяжении программы до возвращения участника в Казахстан" },
+    { "id": "english-course", "title": "Трёхмесячный разговорный курс английского" },
+    { "id": "visa-checklist", "title": "Чек-лист подготовки к визовому собеседованию" },
+    { "id": "extra-materials", "title": "Дополнительные материалы и рекомендации" },
+    { "id": "personal-author", "title": "Персональная связь с автором сервиса один на один в течение года" },
+    { "id": "max-support", "title": "Максимальная индивидуальная поддержка" },
+    { "id": "offer-matching", "title": "Индивидуальный подбор офферов с ориентиром от $17 в час, города и подходящей работы в течение двух месяцев", "footnote": "offer-floor" },
+    { "id": "visa-prep", "title": "Подготовка к визовому собеседованию" },
+    { "id": "personal-support", "title": "Полное личное сопровождение в течение года" }
+  ],
+  "footnotes": {
+    "offer-floor": "$17 в час — ориентир, от которого мы подбираем предложения. Это не гарантия вакансии, количества рабочих часов или заработка. Наличие работы и её условия подтверждаются только конкретным письменным оффером работодателя и американским спонсором J-1."
+  },
+  "plans": [
+    {
+      "id": "lite",
+      "name": "Lite",
+      "tagline": "Самостоятельный путь с понятной картой",
+      "price": 5990,
+      "currency": "KZT",
+      "period": "year",
+      "includesPlan": null,
+      "features": ["guide", "checklists", "agency-table"],
+      "highlight": false
+    },
+    {
+      "id": "classic",
+      "name": "Classic",
+      "tagline": "Куратор, английский и подготовка к визе",
+      "price": 7990,
+      "currency": "KZT",
+      "period": "year",
+      "includesPlan": "lite",
+      "features": ["guide", "checklists", "agency-table", "curator-group", "english-course", "visa-checklist", "extra-materials"],
+      "highlight": true
+    },
+    {
+      "id": "all-in",
+      "name": "All-in",
+      "tagline": "Личное сопровождение весь год",
+      "price": 15999,
+      "currency": "KZT",
+      "period": "year",
+      "includesPlan": "classic",
+      "features": ["guide", "checklists", "agency-table", "curator-group", "english-course", "visa-checklist", "extra-materials", "personal-author", "max-support", "offer-matching", "visa-prep", "personal-support"],
+      "highlight": false
+    }
+  ]
+}

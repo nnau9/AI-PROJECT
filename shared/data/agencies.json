@@ -1,0 +1,299 @@
+{
+  "meta": {
+    "verifiedAt": "2026-11-11",
+    "method": "Сведения взяты только с сайтов самих агентств и официальных страниц BridgeUSA. Всё, что агентство пишет о себе, помечено как заявление организации. Американский спонсор J-1 проверяется отдельно — по официальному списку BridgeUSA. Порядок карточек — алфавитный, это не рейтинг.",
+    "statusLabels": {
+      "verified": "Подтверждено независимыми источниками",
+      "sponsor_listed": "Названный спонсор есть в списке BridgeUSA",
+      "claims_only": "Только заявления агентства",
+      "needs_check": "Нужна проверка"
+    }
+  },
+  "agencies": [
+    {
+      "id": "abc-universe",
+      "name": "ABC Universe (Work and Travel US)",
+      "description": "Агентство из Алматы. На сайте предлагает два тарифа: Full (агентство подбирает работодателя) и Self (участник ищет работодателя сам).",
+      "cities": ["Алматы"],
+      "offices": [
+        { "city": "Алматы", "address": "пр. Абая, 44А, БЦ «Promenade», офис 9В", "sourceId": "abc-home" }
+      ],
+      "contacts": {
+        "website": "https://workandtravelus.kz/",
+        "phones": [{ "label": "Телефон / WhatsApp", "value": "+7 707 561-96-21", "href": "tel:+77075619621" }],
+        "emails": [],
+        "social": [
+          { "type": "instagram", "url": "https://www.instagram.com/workandtraveluskz/" },
+          { "type": "whatsapp", "url": "https://wa.me/77075619621" }
+        ],
+        "sourceId": "abc-home",
+        "checkedAt": "2026-11-11"
+      },
+      "usSponsor": {
+        "claimedNames": ["CIEE", "Alliance Abroad Group"],
+        "sponsorIds": ["ciee-inc", "alliance-abroad-lp"],
+        "relationStatus": "agency_claim",
+        "relationNote": "Связь с этими спонсорами указана только на сайте агентства; подтверждения от самих спонсоров не найдено.",
+        "officialRecordUrl": "https://j1visa.state.gov/sponsors/sponsor-by-country/?program=Summer%20Work%20Travel"
+      },
+      "services": [
+        "Заполнение анкеты DS-160",
+        "Подготовка к визовому собеседованию",
+        "Медицинская страховка (по сайту — «до $100 000»)",
+        "Подбор job offer, резюме и подготовка к интервью с работодателем (тариф Full)",
+        "Координатор в Казахстане"
+      ],
+      "servicesSourceId": "abc-home",
+      "claims": [
+        { "text": "«Официально представляем CIEE и Alliance Abroad Group»", "sourceId": "abc-home" },
+        { "text": "Доля одобренных виз: 94% (2024), 96% (2025), 90% (2026) — по данным агентства, методика не раскрыта", "sourceId": "abc-home" },
+        { "text": "Требования агентства: студенты бакалавриата очной формы, не выпускной курс, 18–22 года, английский от Intermediate", "sourceId": "abc-home" },
+        { "text": "На сайте указано, что агентство не гарантирует одобрение визы", "sourceId": "abc-home" }
+      ],
+      "publishedPrices": [
+        {
+          "label": "Тариф Full",
+          "amount": 3400,
+          "currency": "USD",
+          "season": "2027",
+          "included": ["подбор и предоставление job offer", "помощь с резюме", "подготовка к интервью с работодателем", "помощь с DS-160", "подготовка к визовому собеседованию", "медстраховка (по сайту — до $100 000)", "поддержка спонсора в США 24/7"],
+          "notIncluded": ["консульский сбор — по сайту $185", "SEVIS — по сайту $35", "авиабилеты — по сайту ориентировочно $800–1 300", "деньги на первые недели — по сайту $1 000–1 500"],
+          "sourceId": "abc-home",
+          "asOf": "2026-11-11",
+          "note": "Оплата по графику: 200 000 ₸, затем $450 и $2 520."
+        },
+        {
+          "label": "Тариф Self",
+          "amount": 3100,
+          "currency": "USD",
+          "season": "2027",
+          "included": ["как в Full, но без подбора работодателя агентством"],
+          "notIncluded": ["те же отдельные расходы, что у Full"],
+          "sourceId": "abc-home",
+          "asOf": "2026-11-11",
+          "note": "На сайте: «Набор закрыт».",
+          "closed": true
+        }
+      ],
+      "verificationStatus": "sponsor_listed",
+      "sources": ["abc-home", "bridgeusa-sponsors-swt"],
+      "lastVerifiedAt": "2026-11-11",
+      "openQuestions": ["Email на сайте не указан", "Подтверждение партнёрства от CIEE и Alliance Abroad не найдено"]
+    },
+    {
+      "id": "american-trip",
+      "name": "American Trip",
+      "description": "На сайте называет себя агентством международного обмена; помимо Work & Travel упоминает Internship USA.",
+      "cities": [],
+      "offices": [],
+      "contacts": {
+        "website": "https://americantrip.kz/",
+        "phones": [{ "label": "Телефон", "value": "+7 708 987 1440", "href": "tel:+77089871440" }],
+        "emails": ["info@americantrip.kz"],
+        "social": [
+          { "type": "instagram", "url": "https://www.instagram.com/workandtravel_astana/" },
+          { "type": "telegram", "url": "https://t.me/corvettecenterastana" }
+        ],
+        "sourceId": "americantrip-home",
+        "checkedAt": "2026-11-11"
+      },
+      "usSponsor": {
+        "claimedNames": [],
+        "sponsorIds": [],
+        "relationStatus": "not_named",
+        "relationNote": "Сайт сообщает о работе «с аккредитованными американскими спонсорами», но не называет их.",
+        "officialRecordUrl": null
+      },
+      "services": [
+        "Подбор работодателя",
+        "Пакет документов и DS-2019",
+        "Визовая поддержка и подготовка к собеседованию",
+        "Медицинская страховка",
+        "Предвыездная ориентация",
+        "Помощь в подборе жилья"
+      ],
+      "servicesSourceId": "americantrip-home",
+      "claims": [
+        { "text": "«Официальный представитель программы Work & Travel USA в Казахстане»", "sourceId": "americantrip-home" },
+        { "text": "«Работаем напрямую с аккредитованными американскими спонсорами и работодателями» — спонсоры не названы", "sourceId": "americantrip-home" },
+        { "text": "Возрастные требования на сайте указаны противоречиво (18–25, 20–30, 18–28 лет)", "sourceId": "americantrip-home" }
+      ],
+      "publishedPrices": [],
+      "verificationStatus": "claims_only",
+      "sources": ["americantrip-home"],
+      "lastVerifiedAt": "2026-11-11",
+      "openQuestions": ["Город и адрес офиса не указаны", "Спонсор J-1 не назван", "Стоимость программы не опубликована"]
+    },
+    {
+      "id": "iec",
+      "name": "Центр Международного Обмена (IEC)",
+      "description": "Сеть офисов программ обмена с офисами в Астане и Алматы; на сайте также указана Караганда.",
+      "cities": ["Астана", "Алматы", "Караганда"],
+      "offices": [
+        { "city": "Астана", "address": "ул. Динмухамеда Кунаева, 33, офис 305", "sourceId": "iec-astana" },
+        { "city": "Алматы", "address": "ул. Толе би, 73А, БЦ «Nyr» (как на сайте), офис 408", "sourceId": "iec-almaty" },
+        { "city": "Караганда", "address": null, "sourceId": "iec-astana" }
+      ],
+      "contacts": {
+        "website": "https://workandtravel.com/ru/contacts/astana/",
+        "phones": [
+          { "label": "Астана", "value": "+7 777 785 0812", "href": "tel:+77777850812" },
+          { "label": "Алматы", "value": "+7 777 785 0813", "href": "tel:+77777850813" },
+          { "label": "Алматы", "value": "+7 777 785 0814", "href": "tel:+77777850814" }
+        ],
+        "emails": ["astana@iec.kz", "almaty@iec.kz"],
+        "social": [
+          { "type": "instagram", "url": "https://www.instagram.com/iec.kazakhstan/" },
+          { "type": "telegram", "url": "https://telegram.me/iecwat" }
+        ],
+        "sourceId": "iec-almaty",
+        "checkedAt": "2026-11-11"
+      },
+      "usSponsor": {
+        "claimedNames": ["InterExchange"],
+        "sponsorIds": ["interexchange-inc"],
+        "relationStatus": "agency_claim",
+        "relationNote": "На сайте: «наш партнер в США — InterExchange, с которым мы работаем эксклюзивно». Подтверждение от InterExchange не найдено.",
+        "officialRecordUrl": "https://j1visa.state.gov/sponsors/sponsor-by-country/?program=Summer%20Work%20Travel"
+      },
+      "services": [
+        "Программа Work and Travel USA и другие программы обмена",
+        "Рассрочка оплаты (по сайту — «доступна не во всех странах»)",
+        "Консультация по заявке"
+      ],
+      "servicesSourceId": "iec-about",
+      "claims": [
+        { "text": "«Самое опытное агентство Work and Travel USA»", "sourceId": "iec-about" },
+        { "text": "«Лидер в организации международных программ с 1989 года», «110 000+ клиентов»", "sourceId": "iec-about" },
+        { "text": "Размер сети указан на сайте по-разному: «50+ офисов в 10 странах» и «13 стран»", "sourceId": "iec-about" }
+      ],
+      "publishedPrices": [],
+      "verificationStatus": "sponsor_listed",
+      "sources": ["iec-astana", "iec-almaty", "iec-about", "bridgeusa-sponsors-swt"],
+      "lastVerifiedAt": "2026-11-11",
+      "openQuestions": ["Адрес офиса в Караганде не проверялся", "Стоимость программы на проверенных страницах не опубликована"]
+    },
+    {
+      "id": "kcet",
+      "name": "KCET — Kazakhstan Council for Educational Travel",
+      "description": "Алматинская компания программ обмена: Summer Work and Travel, Camp Counselor, Au Pair, стажировки и другие программы. Также продаёт авиабилеты и оказывает туристические услуги.",
+      "cities": ["Алматы", "Костанай"],
+      "offices": [
+        { "city": "Алматы", "address": "пр. Сейфуллина, 500, оф. 47 (угол ул. Карасай батыра)", "sourceId": "kcet-contacts" },
+        { "city": "Костанай", "address": null, "sourceId": "kcet-company" }
+      ],
+      "contacts": {
+        "website": "https://www.kcet.kz/",
+        "phones": [
+          { "label": "Основной", "value": "+7 747 250 7777", "href": "tel:+77472507777" },
+          { "label": "", "value": "+7 747 350 7777", "href": "tel:+77473507777" },
+          { "label": "", "value": "+7 705 209 5555", "href": "tel:+77052095555" },
+          { "label": "", "value": "+7 777 284 8888", "href": "tel:+77772848888" }
+        ],
+        "emails": ["info@kcet.kz"],
+        "social": [
+          { "type": "instagram", "url": "https://www.instagram.com/kcet.kz/" },
+          { "type": "telegram", "url": "https://t.me/kcetfamily" }
+        ],
+        "sourceId": "kcet-contacts",
+        "checkedAt": "2026-11-11"
+      },
+      "usSponsor": {
+        "claimedNames": [],
+        "sponsorIds": [],
+        "relationStatus": "not_named",
+        "relationNote": "На проверенных страницах спонсор SWT не назван. Упомянут сертификат «CETUSA Agent Internship Training», но этого недостаточно, чтобы считать CETUSA спонсором агентства по SWT.",
+        "officialRecordUrl": null
+      },
+      "services": [
+        "Summer Work and Travel и Camp Counselor USA",
+        "Ярмарки вакансий с работодателями",
+        "Интервью с работодателями и спонсорами по Skype в офисе",
+        "Помощь с документами и подготовка к интервью в посольстве",
+        "Продажа авиабилетов"
+      ],
+      "servicesSourceId": "kcet-company",
+      "claims": [
+        { "text": "«25 лет на рынке»", "sourceId": "kcet-home" },
+        { "text": "Член WYSE Travel Confederation и IAPA; представитель ISIC в Казахстане и Кыргызстане", "sourceId": "kcet-company" },
+        { "text": "«Работаем по прямым договорам и являемся представителями зарубежных учебных центров»", "sourceId": "kcet-company" }
+      ],
+      "publishedPrices": [
+        {
+          "label": "Summer Work and Travel (2,5–5 месяцев)",
+          "amount": 1685,
+          "currency": "USD",
+          "prefix": "от",
+          "season": null,
+          "included": [],
+          "notIncluded": [],
+          "sourceId": "kcet-company",
+          "asOf": "2026-11-11",
+          "note": "Сезон и состав цены на странице не указаны."
+        }
+      ],
+      "verificationStatus": "claims_only",
+      "sources": ["kcet-home", "kcet-company", "kcet-contacts", "kcet-new"],
+      "lastVerifiedAt": "2026-11-11",
+      "openQuestions": ["Спонсор SWT не назван", "Что входит в цену «от 1685 $», не раскрыто", "new.kcet.kz не открывается (ошибка сертификата)"]
+    },
+    {
+      "id": "watusa-kz",
+      "name": "Work and Travel USA Kazakhstan (Opportunity)",
+      "description": "Программа Work and Travel USA с офисами в Астане, Алматы и Караганде. На сайте описаны варианты Full Program и Self-Placed.",
+      "cities": ["Астана", "Алматы", "Караганда"],
+      "offices": [
+        { "city": "Астана", "address": "пр. Кабанбай батыра, 7/2 (головной офис)", "sourceId": "watusa-contacts" },
+        { "city": "Алматы", "address": "ул. Желтоксан, 111а, БЦ «Желтоксан», 3 этаж, офис 17", "sourceId": "watusa-contacts" },
+        { "city": "Караганда", "address": "ул. Университетская, 28 (главный корпус КарГУ, 4 этаж, каб. 446)", "sourceId": "watusa-contacts" }
+      ],
+      "contacts": {
+        "website": "https://www.workandtravelusa.kz/",
+        "phones": [{ "label": "Телефон (по сайту — также WhatsApp)", "value": "+7 776 263 7422", "href": "tel:+77762637422" }],
+        "emails": ["info@workandtravelusa.kz", "astana@workandtravelusa.kz", "almaty@workandtravelusa.kz", "karaganda@workandtravelusa.kz"],
+        "social": [
+          { "type": "instagram", "url": "https://www.instagram.com/workandtravel_kazakhstan/" }
+        ],
+        "sourceId": "watusa-contacts",
+        "checkedAt": "2026-11-11"
+      },
+      "usSponsor": {
+        "claimedNames": [],
+        "sponsorIds": [],
+        "relationStatus": "not_named",
+        "relationNote": "На проверенных страницах спонсор J-1 не назван.",
+        "officialRecordUrl": null
+      },
+      "services": [
+        "Подготовка документов и пакета на визу J-1",
+        "Выдача DS-2019 (через спонсора)",
+        "Медицинская страховка",
+        "Предвыездное собрание",
+        "Индивидуальный подбор работы (в Full Program)"
+      ],
+      "servicesSourceId": "watusa-programs",
+      "claims": [
+        { "text": "«Самая низкая стоимость в Казахстане»", "sourceId": "watusa-home" },
+        { "text": "Телефон поддержки в США и Казахстане 24/7", "sourceId": "watusa-programs" }
+      ],
+      "publishedPrices": [
+        {
+          "label": "Full Program Option",
+          "amount": 2200,
+          "currency": "USD",
+          "season": "2026",
+          "included": ["подготовка документов", "оформление DS-2019", "пакет документов на визу J-1", "медстраховка", "предвыездное собрание", "поддержка 24/7", "индивидуальный подбор работы"],
+          "notIncluded": ["административный сбор — по сайту 120 000 ₸", "SEVIS — по сайту $35", "визовый сбор — по сайту $180", "авиабилеты — по сайту ориентировочно $1 000–1 200"],
+          "sourceId": "watusa-programs",
+          "asOf": "2026-11-11",
+          "note": "Устарело: цена привязана к оплате до 15.06.2025 ($2 300 — до 15.07.2025), приём на сезон 2026 завершён 15.03.2026. Страница не является публичной офертой.",
+          "stale": true
+        }
+      ],
+      "verificationStatus": "claims_only",
+      "sources": ["watusa-home", "watusa-contacts", "watusa-programs"],
+      "lastVerifiedAt": "2026-11-11",
+      "openQuestions": ["Спонсор J-1 не назван", "Цены на сайте за прошлый сезон"]
+    }
+  ]
+}

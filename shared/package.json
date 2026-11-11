@@ -1,0 +1,11 @@
+{
+  "name": "@swt/shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Общий слой данных и бизнес-функций для web и mobile",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node --test tests/data.test.js"
+  }
+}

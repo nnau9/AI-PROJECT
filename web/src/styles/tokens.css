@@ -1,0 +1,136 @@
+/*
+  NNATO — дизайн-токены «Poster Modernist».
+  Кремовый фон, графитовый текст, единственный акцент — кобальтовый синий.
+  Без градиентов, теней и скруглений. Глубина — только плоскими блоками цвета и линиями 1px.
+
+  Шрифт: General Sans / Aileron не содержат кириллицы, поэтому используется Inter Tight
+  (тот же характер гротеска, есть кириллица и вес 900). Моноширинный — JetBrains Mono.
+*/
+:root {
+  --font-sans: "Inter Tight", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+
+  --bg: #e3e2de;            /* Cream */
+  --surface: #e3e2de;
+  --surface-muted: #dad9d4; /* плоский блок на тон темнее фона */
+  --surface-sunken: #d1d0cb;
+  --hover: rgb(255 255 255 / 0.2);
+  --text: #141414;          /* Jet Black */
+  --text-muted: #444343;    /* Deep Gray — основной текст абзацев */
+  /* Muted из спецификации — #7A7A7A; затемнён до #636363, чтобы мелкие подписи
+     проходили контраст WCAG AA (≥ 4.5:1) на кремовом фоне. */
+  --text-label: #636363;
+  --border: #c7c7c7;
+  --border-strong: #141414;
+  --accent: #1351aa;        /* Cobalt Blue */
+  --accent-hover: #141414;
+  --accent-soft: rgb(19 81 170 / 0.08);
+  --on-accent: #e3e2de;
+  --ok: #1f6b3a;
+  --ok-soft: rgb(31 107 58 / 0.08);
+  --warn: #8a4b00;
+  --warn-soft: rgb(138 75 0 / 0.08);
+  --danger: #b3261e;
+  --danger-soft: rgb(179 38 30 / 0.08);
+  --focus: #1351aa;
+
+  /* Совместимость со старыми именами (подпись бренда теперь — синий акцент) */
+  --sig-1: #1351aa;
+  --sig-2: #1351aa;
+  --sig-soft: var(--surface-muted);
+  --sig-ink: #1351aa;
+
+  /* Плоские тёмные блоки */
+  --ink: #141414;
+  --ink-2: #1f1f1f;
+  --on-ink: #e3e2de;
+  --on-ink-muted: #a9a8a4;
+  --link-on-ink: #8fb2ea;
+
+  /* Графика */
+  --art-bg: #dad9d4;
+  --art-line: #c7c7c7;
+  --art-ground: #141414;
+  --art-route: #1351aa;
+  --art-chip: #e3e2de;
+  --art-chip-text: #141414;
+
+  --radius-s: 0;
+  --radius-m: 0;
+  --radius-l: 0;
+  --shadow: none;
+  --shadow-lift: none;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 64px;
+  --space-8: 120px;
+
+  --gutter: 16px;
+  --container: 1440px;
+  --container-wide: 1440px;
+  --header-h: 80px;
+  --bottom-nav-h: 64px;
+  --tap: 44px;
+
+  --fs-body: 1.125rem;
+  --fs-small: 0.875rem;
+  --fs-label: 0.75rem;
+  --fs-hero: clamp(3.25rem, 0.6rem + 8.2vw, 9rem);
+  --fs-display: clamp(2.5rem, 0.9rem + 5.2vw, 6.5rem);
+  --fs-h1: clamp(2.75rem, 1rem + 5.4vw, 6.5rem);
+  --fs-h2: clamp(1.75rem, 1.2rem + 2vw, 3rem);
+  --fs-h3: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+  --fs-lead: clamp(1.125rem, 1rem + 0.4vw, 1.375rem);
+
+  --ease: linear;
+  --ease-out: linear;
+  --dur: 300ms;
+}
+@media (min-width: 720px) { :root { --gutter: 32px; } }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141414;
+    --surface: #141414;
+    --surface-muted: #1c1c1c;
+    --surface-sunken: #262626;
+    --hover: rgb(255 255 255 / 0.04);
+    --text: #e3e2de;
+    --text-muted: #b5b4b0;
+    --text-label: #8e8e8e;
+    --border: #333333;
+    --border-strong: #e3e2de;
+    --accent: #6f9ce6;
+    --accent-hover: #e3e2de;
+    --accent-soft: rgb(111 156 230 / 0.12);
+    --on-accent: #141414;
+    --ok: #74c98f;
+    --ok-soft: rgb(116 201 143 / 0.1);
+    --warn: #f3b860;
+    --warn-soft: rgb(243 184 96 / 0.1);
+    --danger: #f08a83;
+    --danger-soft: rgb(240 138 131 / 0.1);
+    --focus: #6f9ce6;
+    --sig-1: #6f9ce6;
+    --sig-2: #6f9ce6;
+    --sig-ink: #6f9ce6;
+
+    --ink: #e3e2de;
+    --ink-2: #d6d5d1;
+    --on-ink: #141414;
+    --on-ink-muted: #4a4a49;
+    --link-on-ink: #1351aa;
+
+    --art-bg: #1c1c1c;
+    --art-line: #333333;
+    --art-ground: #e3e2de;
+    --art-route: #6f9ce6;
+    --art-chip: #141414;
+    --art-chip-text: #e3e2de;
+  }
+}
