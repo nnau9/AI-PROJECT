@@ -104,9 +104,9 @@ export function PageHeader({ eyebrow, title, lead, children, center = false, pho
 }
 
 /** Раздел 12-колоночной сетки: колонки 1–3 — липкая подпись, 4–12 — контент. */
-export function GridSection({ label, index, labelledBy, className = '', children }) {
+export function GridSection({ id, label, index, labelledBy, className = '', children }) {
   return (
-    <section className={`gsec ${className}`} aria-labelledby={labelledBy}>
+    <section id={id} className={`gsec ${className}`} aria-labelledby={labelledBy}>
       <div className="container gsec__grid">
         <div className="gsec__side">
           <p className="side-label">

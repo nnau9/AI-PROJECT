@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { formatDate } from '@shared/index.js';
 import { useContent } from '../hooks/useResource.js';
 import {
@@ -21,6 +22,15 @@ const loaders = {
 
 export default function ImportantPage() {
   const { status, data, error, retry } = useContent(loaders);
+  const { hash } = useLocation();
+
+  // Переход с главной по ссылке вида #/important#contract — прокрутить к разделу.
+  useEffect(() => {
+    if (status !== 'success' || !hash) return;
+    const id = decodeURIComponent(hash.slice(1));
+    requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ block: 'start' }));
+  }, [status, hash]);
+
   if (status === 'loading') return <div className="container section"><LoadingState /></div>;
   if (status === 'error') return <div className="container section"><ErrorState error={error} onRetry={retry} /></div>;
 
