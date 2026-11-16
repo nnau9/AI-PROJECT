@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import Icon from './Icon.jsx';
 import { Wordmark } from './Brand.jsx';
+import { AssistantProvider, AssistantTrigger } from './assistant/Assistant.jsx';
 
 export const NAV_ITEMS = [
   { to: '/', label: 'Главная', short: 'Главная', icon: 'home', end: true },
@@ -23,7 +24,7 @@ function ScrollManager() {
 
 export default function Layout({ children }) {
   return (
-    <>
+    <AssistantProvider>
       <ScrollManager />
       <a className="skip-link" href="#main" onClick={(e) => { e.preventDefault(); document.getElementById('main')?.focus(); }}>
         Перейти к содержимому
@@ -41,8 +42,12 @@ export default function Layout({ children }) {
                   <NavLink to={item.to} end={item.end}>{item.label}</NavLink>
                 </li>
               ))}
+              <li>
+                <AssistantTrigger variant="nav" />
+              </li>
             </ul>
           </nav>
+          <AssistantTrigger variant="solo" />
           <Link to="/apply" className="btn btn--primary btn--small header-cta">
             Заявка
           </Link>
@@ -90,6 +95,6 @@ export default function Layout({ children }) {
           </NavLink>
         ))}
       </nav>
-    </>
+    </AssistantProvider>
   );
 }

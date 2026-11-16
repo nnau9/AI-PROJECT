@@ -1,6 +1,8 @@
 // Публичный API общего слоя. И web, и mobile импортируют только отсюда.
 export { createContentRepository } from './repositories/contentRepository.js';
 export { createLeadRepository } from './repositories/leadRepository.js';
+export { createAssistantRepository, loadAssistantContent } from './repositories/assistantRepository.js';
+export { ASSISTANT_GREETING, ASSISTANT_SUGGESTIONS } from './services/assistant.js';
 export * from './services/sources.js';
 export * from './services/agencies.js';
 export * from './services/plans.js';

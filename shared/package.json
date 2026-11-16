@@ -6,6 +6,6 @@
   "type": "module",
   "main": "src/index.js",
   "scripts": {
-    "test": "node --test tests/data.test.js"
+    "test": "node --test tests/data.test.js tests/assistant.test.js"
   }
 }

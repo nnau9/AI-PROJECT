@@ -1,0 +1,231 @@
+/* ==========================================================================
+   Чат-помощник (косатка). Тот же язык, что у сайта: нулевые радиусы, линии 1px,
+   плоские блоки цвета, без теней и градиентов, переходы — цвет/прозрачность, linear.
+   ========================================================================== */
+
+:root {
+  /* Косатка чёрно-белая в обеих темах; фон плитки — акцент сайта. */
+  --orca-tile: var(--accent);
+  --orca-body: #141414;
+  --orca-white: #e3e2de;
+  --orca-saddle: #7a7a7a;
+  --assistant-z: 40; /* выше шапки (20) и нижней навигации (30), ниже skip-link (100) */
+}
+
+.orca { display: block; flex: none; }
+
+/* ============ Кнопка вызова в шапке ============ */
+.assistant-trigger {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-width: var(--tap); min-height: var(--tap); padding: 0;
+  background: none; border: 0; border-bottom: 2px solid transparent; border-radius: 0;
+  color: var(--text); font: inherit; font-size: 0.875rem; font-weight: 600; cursor: pointer;
+  transition: color var(--dur) linear, border-color var(--dur) linear;
+}
+.assistant-trigger:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.assistant-trigger[aria-expanded="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+/* Подпись видна только в широком верхнем меню; название кнопки для скринридеров — в aria-label. */
+.assistant-trigger__label { display: none; }
+
+/* Телефон и планшет: значок между логотипом и «Заявка». */
+.assistant-trigger--solo { margin-left: auto; margin-right: calc(var(--space-3) * -1); }
+.assistant-trigger--solo + .header-cta { margin-left: 0; }
+/* Компьютер: пункт верхнего меню. Пока меню узкое — только значок, без подписи. */
+.assistant-trigger--nav { min-width: 0; margin-right: var(--space-4); }
+@media (min-width: 1100px) {
+  .assistant-trigger--solo { display: none; }
+  .site-header .top-nav ul { align-items: center; white-space: nowrap; }
+}
+@media (min-width: 1100px) and (max-width: 1219px) {
+  /* Значок помещается в ту же колонку меню, если пункты стоят чуть плотнее. */
+  .site-header .top-nav ul { gap: var(--space-3); }
+}
+@media (min-width: 1400px) {
+  .assistant-trigger--nav { margin-right: 0; }
+  .assistant-trigger--nav .assistant-trigger__label { display: inline; }
+}
+
+/* ============ Приглашение ============ */
+.assistant-invite {
+  position: fixed; z-index: var(--assistant-z);
+  right: var(--gutter); bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom) + var(--space-3));
+  display: flex; align-items: stretch; max-width: calc(100vw - 2 * var(--gutter));
+  background: var(--bg); color: var(--text); border: 1px solid var(--border-strong);
+  opacity: 0; visibility: hidden;
+  transition: opacity 400ms linear, visibility 0s linear 400ms;
+}
+.assistant-invite.is-visible { opacity: 1; visibility: visible; transition: opacity 400ms linear; }
+@media (min-width: 1100px) { .assistant-invite { bottom: var(--space-5); } }
+
+.assistant-invite__open {
+  display: flex; align-items: center; gap: 14px; min-width: 0; padding: 0 16px 0 0;
+  background: none; border: 0; border-radius: 0; color: inherit; font: inherit; text-align: left; cursor: pointer;
+  transition: background-color var(--dur) linear, color var(--dur) linear;
+}
+.assistant-invite__open:hover { background: var(--text); color: var(--bg); }
+.assistant-invite__text { display: grid; gap: 4px; min-width: 0; }
+.assistant-invite__label {
+  font-family: var(--font-mono); font-size: 0.6875rem; line-height: 1.2; text-transform: uppercase; color: var(--text-label);
+  transition: color var(--dur) linear;
+}
+.assistant-invite__open:hover .assistant-invite__label { color: inherit; }
+.assistant-invite__title { font-size: 1rem; font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; }
+.assistant-invite__close {
+  display: grid; place-items: center; flex: none; width: var(--tap); min-height: var(--tap); padding: 0;
+  background: none; border: 0; border-left: 1px solid var(--border); border-radius: 0; color: var(--text-muted); cursor: pointer;
+  transition: background-color var(--dur) linear, color var(--dur) linear;
+}
+.assistant-invite__close:hover { background: var(--text); color: var(--bg); }
+/* Телефон: вопрос в две строки, чтобы приглашение занимало меньше ширины экрана. */
+@media (max-width: 519px) { .assistant-invite__title { max-width: 10.5em; } }
+.assistant-invite :focus-visible { outline-offset: -3px; }
+.assistant-invite__open:hover:focus-visible, .assistant-invite__close:hover:focus-visible { outline-color: var(--bg); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .assistant-invite.is-visible .orca__figure { animation: orca-bob 3.6s ease-in-out infinite alternate; }
+}
+@keyframes orca-bob {
+  from { transform: translateY(1.5px); }
+  to { transform: translateY(-1.5px); }
+}
+
+/* ============ Окно чата ============ */
+/* Телефон: лист между шапкой и нижней навигацией — обе остаются доступны. */
+.assistant {
+  position: fixed; z-index: var(--assistant-z);
+  top: var(--header-h); right: 0; left: 0; bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom));
+  display: flex; flex-direction: column;
+  background: var(--bg); color: var(--text);
+}
+.assistant:focus { outline: none; }
+.assistant.is-keyboard { bottom: var(--assistant-keyboard, 0px); }
+
+/* Планшет и компьютер: плавающее окно в правом нижнем углу. */
+@media (min-width: 720px) {
+  .assistant {
+    top: auto; left: auto; right: var(--gutter);
+    bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom) + var(--space-4));
+    width: 400px;
+    height: min(640px, calc(100vh - var(--header-h) - var(--bottom-nav-h) - 2 * var(--space-4)));
+    height: min(640px, calc(100dvh - var(--header-h) - var(--bottom-nav-h) - env(safe-area-inset-bottom) - 2 * var(--space-4)));
+    border: 1px solid var(--border-strong);
+  }
+  .assistant.is-keyboard { top: calc(var(--header-h) + var(--space-2)); bottom: calc(var(--assistant-keyboard, 0px) + var(--space-2)); height: auto; }
+}
+@media (min-width: 1100px) {
+  .assistant {
+    bottom: var(--space-5);
+    height: min(640px, calc(100vh - var(--header-h) - 2 * var(--space-5)));
+    height: min(640px, calc(100dvh - var(--header-h) - 2 * var(--space-5)));
+  }
+}
+/* Низкий экран (телефон в альбомной ориентации): снова лист на всю ширину и компактная шапка окна. */
+@media (max-width: 1099px) and (max-height: 520px) {
+  .assistant {
+    top: var(--header-h); right: 0; left: 0; bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom));
+    width: auto; height: auto; border: 0;
+  }
+  .assistant.is-keyboard { top: var(--header-h); bottom: var(--assistant-keyboard, 0px); }
+  .assistant__head { padding-top: 4px; padding-bottom: 4px; }
+  .assistant__head .orca { width: 32px; height: 32px; }
+  .assistant__status { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .assistant { animation: assistant-in var(--dur) linear; }
+}
+@keyframes assistant-in { from { opacity: 0; } }
+
+.assistant__head {
+  display: flex; align-items: center; gap: 12px; flex: none; padding: 10px 10px 10px 12px;
+  background: var(--ink); color: var(--on-ink);
+}
+.assistant__heading { flex: 1; min-width: 0; }
+.assistant__title { margin: 0; font-size: 0.875rem; font-weight: 800; line-height: 1.2; letter-spacing: 0.1em; text-transform: uppercase; }
+.assistant__status {
+  display: flex; align-items: center; gap: 8px; margin: 4px 0 0;
+  font-family: var(--font-mono); font-size: 0.6875rem; line-height: 1.3; text-transform: uppercase; color: var(--on-ink-muted);
+}
+.assistant__dot { flex: none; width: 8px; height: 8px; background: var(--link-on-ink); }
+.assistant__close {
+  display: inline-flex; align-items: center; gap: 8px; flex: none; min-height: var(--tap); padding: 0 12px;
+  background: transparent; color: var(--on-ink); border: 1px solid var(--on-ink-muted); border-radius: 0; cursor: pointer;
+  font: inherit; font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em;
+  transition: background-color var(--dur) linear, color var(--dur) linear;
+}
+.assistant__close:hover { background: var(--on-ink); color: var(--ink); }
+.assistant__head :focus-visible { outline-color: var(--link-on-ink); }
+
+.assistant__log {
+  position: relative; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4);
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+.assistant__log:focus-visible { outline-offset: -2px; }
+
+.assistant-msg { flex: none; max-width: 90%; padding: 10px 14px; font-size: 0.9375rem; line-height: 1.45; overflow-wrap: anywhere; }
+.assistant-msg--assistant { align-self: flex-start; background: var(--surface-muted); border-left: 2px solid var(--accent); }
+.assistant-msg--user { align-self: flex-end; background: var(--accent); color: var(--on-accent); }
+.assistant-msg p, .assistant-msg ul { margin: 0 0 8px; }
+.assistant-msg > :last-child { margin-bottom: 0; }
+.assistant-msg ul { padding-left: 1.1em; }
+.assistant-msg li + li { margin-top: 4px; }
+.assistant-msg__topic { font-family: var(--font-mono); font-size: 0.6875rem; line-height: 1.4; text-transform: uppercase; color: var(--text-muted); }
+.assistant-msg .assistant-msg__links { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; padding: 0; }
+.assistant-msg__links li + li { margin-top: 0; }
+.assistant-msg__links a {
+  display: inline-flex; align-items: center; gap: 8px; min-height: var(--tap); padding: 8px 12px;
+  border: 1px solid var(--text); color: var(--text); text-decoration: none;
+  font-size: 0.6875rem; font-weight: 700; line-height: 1.3; text-transform: uppercase; letter-spacing: 0.1em;
+  transition: background-color var(--dur) linear, color var(--dur) linear;
+}
+.assistant-msg__links a:hover { background: var(--text); color: var(--bg); }
+
+.assistant__suggestions { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; }
+.assistant__suggestion {
+  min-height: var(--tap); padding: 8px 12px; text-align: left;
+  background: transparent; color: var(--text); border: 1px solid var(--border-strong); border-radius: 0; cursor: pointer;
+  font: inherit; font-size: 0.8125rem; font-weight: 600; line-height: 1.3;
+  transition: background-color var(--dur) linear, color var(--dur) linear;
+}
+.assistant__suggestion:hover { background: var(--text); color: var(--bg); }
+
+/* Индикатор набора — три квадрата, как мигающий квадрат на первом экране. */
+.assistant-typing { display: inline-flex; align-items: center; gap: 6px; height: 1.45em; }
+.assistant-typing i { width: 8px; height: 8px; background: var(--accent); }
+@media (prefers-reduced-motion: no-preference) {
+  .assistant-typing i { animation: assistant-typing 1.2s step-end infinite; }
+  .assistant-typing i:nth-child(2) { animation-delay: 0.2s; }
+  .assistant-typing i:nth-child(3) { animation-delay: 0.4s; }
+}
+@keyframes assistant-typing {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+.assistant__form { display: flex; flex: none; border-top: 1px solid var(--border-strong); }
+.assistant__input {
+  flex: 1; min-width: 0; min-height: 52px; padding: 12px 14px;
+  background: transparent; color: var(--text); border: 0; border-radius: 0;
+  font: inherit; font-size: 1rem; /* не меньше 16px — iOS не увеличивает страницу при фокусе */
+  transition: background-color var(--dur) linear;
+}
+.assistant__input::placeholder { color: var(--text-label); opacity: 1; }
+.assistant__input:focus { outline: none; background: var(--hover); box-shadow: inset 0 -2px 0 var(--accent); }
+.assistant__send {
+  display: grid; place-items: center; flex: none; width: 52px; padding: 0;
+  background: var(--accent); color: var(--on-accent); border: 0; border-radius: 0; cursor: pointer;
+  transition: background-color var(--dur) linear, color var(--dur) linear;
+}
+.assistant__send:hover:not(:disabled) { background: var(--text); color: var(--bg); }
+.assistant__send:disabled { opacity: 0.45; cursor: default; }
+.assistant__send:focus-visible { outline-offset: -4px; outline-color: var(--on-accent); }
+
+.assistant__note {
+  flex: none; margin: 0; padding: 8px 14px 10px; border-top: 1px solid var(--border);
+  font-size: 0.75rem; line-height: 1.4; color: var(--text-label);
+}
+@media (max-height: 560px) { .assistant__note { display: none; } }
+
+@media print {
+  .assistant, .assistant-invite, .assistant-trigger { display: none; }
+}
