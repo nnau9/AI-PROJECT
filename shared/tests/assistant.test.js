@@ -14,6 +14,7 @@ import {
   ASSISTANT_SUGGESTIONS,
 } from '../src/services/assistant.js';
 import { createAssistantRepository } from '../src/repositories/assistantRepository.js';
+import { needsTeam } from '../src/services/handoff.js';
 
 const dataDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'data');
 const load = (name) => JSON.parse(readFileSync(join(dataDir, name), 'utf8'));
@@ -208,4 +209,87 @@ test('репозиторий: при сбое endpoint возвращается 
   assert.equal(answer.mode, 'local');
   assert.match(answer.text, /5\s990\s₸/);
   assert.ok(selectContext('тарифы', index).length > 0);
+});
+
+test('ответ дополняется фрагментами из других разделов сайта', () => {
+  const answer = findAnswer('горячая линия', index);
+  assert.equal(answer.entryId, 'hotlines');
+  assert.match(answer.text, /Ещё по теме из других разделов сайта/);
+  assert.ok(answer.links.length >= 2 && answer.links.length <= 3);
+});
+
+test('если отдельной карточки нет, ответ собирается из нескольких разделов', () => {
+  const answer = findAnswer('до какого числа можно подать заявку', index);
+  assert.equal(answer.entryId, 'composed');
+  assert.equal(answer.matched, true);
+  assert.match(answer.text, /собрал из разных разделов/);
+  assert.match(answer.text, /Заявка в агентство/);
+  assert.ok(answer.links.length > 0);
+});
+
+/* ---------- Генерация ответов на сервере и перенаправление на команду ---------- */
+
+const remoteRepo = (answer = { answer: 'Сгенерированный ответ 🙂', links: [] }) => {
+  const calls = [];
+  const fetchImpl = async (url, init) => {
+    calls.push(JSON.parse(init.body));
+    return { ok: true, json: async () => answer };
+  };
+  return { calls, repo: createAssistantRepository({ endpoint: 'https://api.example/chat', fetchImpl, loadContent: async () => content, delayMs: 0 }) };
+};
+
+test('готовые ответы (быстрые кнопки, приветствие, связь) не уходят на сервер', async () => {
+  const { calls, repo } = remoteRepo();
+  for (const question of [...ASSISTANT_SUGGESTIONS, 'Привет', 'Спасибо!', 'Как связаться с командой?', 'Ты кто?']) {
+    const answer = await repo.ask(question);
+    assert.equal(answer.mode, 'local', question);
+    assert.equal(answer.text, findAnswer(question, index).text, question);
+  }
+  assert.equal(calls.length, 0);
+});
+
+test('новый вопрос без готового ответа получает сгенерированный ответ', async () => {
+  const { calls, repo } = remoteRepo();
+  const answer = await repo.ask('Какие этапы получения визы J-1?');
+  assert.equal(calls.length, 1);
+  assert.equal(answer.mode, 'api');
+  assert.equal(answer.text, 'Сгенерированный ответ 🙂');
+  assert.ok(!answer.links.some((l) => l.to === '/apply'));
+});
+
+test('вопрос не на русском уходит на сервер, даже если похож на готовый', async () => {
+  const { calls, repo } = remoteRepo();
+  await repo.ask('Hi, who are you?');
+  await repo.ask('Бағдарламаға кім қатыса алады?');
+  assert.equal(calls.length, 2);
+});
+
+test('оплата и личная ситуация: к ответу модели добавляется кнопка связи с командой', async () => {
+  for (const question of ['Как оплатить тариф?', 'Мне раньше отказали в визе, могу ли я поехать?', 'Какой статус моей заявки?']) {
+    const { repo } = remoteRepo();
+    const answer = await repo.ask(question);
+    assert.equal(answer.mode, 'api');
+    assert.equal(answer.links[0].to, '/apply', question);
+  }
+  const { repo } = remoteRepo({ answer: 'Нужен сотрудник', handoff: true });
+  assert.equal((await repo.ask('Какие работодатели в Майами?')).links[0].to, '/apply');
+});
+
+test('без сервера: ответ по сайту + перенаправление на команду для личных вопросов', async () => {
+  const repo = createAssistantRepository({ loadContent: async () => content, delayMs: 0 });
+  const answer = await repo.ask('Можно ли вернуть деньги?');
+  assert.equal(answer.mode, 'local');
+  assert.match(answer.text, /обсудить с нашей командой/);
+  assert.ok(answer.links.some((l) => l.to === '/apply'));
+  const plain = await repo.ask('Какие этапы получения визы J-1?');
+  assert.doesNotMatch(plain.text, /обсудить с нашей командой/);
+});
+
+test('needsTeam: личные и денежные темы — да, общие вопросы — нет', () => {
+  for (const q of ['Как оплатить?', 'верните деньги', 'есть ли скидки', 'договор какой', 'хочу записаться', 'подхожу ли я по возрасту', 'мне отказали в визе', 'статус моей заявки', 'Can I get a refund?', 'Am I eligible?', 'Төлем қалай жасаймын?']) {
+    assert.ok(needsTeam(q), q);
+  }
+  for (const q of ['Какие этапы получения визы J-1?', 'Какая погода в Париже?', 'Кто может участвовать?', 'What is SEVIS?']) {
+    assert.ok(!needsTeam(q), q);
+  }
 });

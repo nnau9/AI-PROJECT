@@ -1,0 +1,17 @@
+{
+  "name": "@swt/chat-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Сервер чата-помощника NNATO: ответы Claude по материалам сайта и официальным источникам J-1",
+  "type": "module",
+  "engines": {
+    "node": ">=20.12"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test tests/chat.test.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.10.0"
+  }
+}

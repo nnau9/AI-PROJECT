@@ -11,6 +11,7 @@ import { formatPrice, formatPlanPrice, getOwnFeatures, getIncludedPlanNames } fr
 import { formatDate, formatMoney } from './format.js';
 import { AGENCY_STATUS_LABELS } from './agencies.js';
 import { groupStepsByPhase } from './steps.js';
+import { CONTACT_LINK } from './handoff.js';
 
 /* ------------------------------------------------------------------ */
 /* Разбор текста                                                        */
@@ -22,6 +23,7 @@ const STOP_WORDS = new Set(`
   я мне меня мой моя мои мы нам нас наш вы вам вас ваш ваши ваша он она они его ее их
   для при про над под без через между если чтобы тоже также еще уже очень просто только
   есть быть будет будут был была было были можно нужно надо ли там тут здесь вот ну
+  другой другая другие других другую другим другое
   пожалуйста подскажите подскажи скажите скажи расскажите расскажи объясните объясни хочу хотел хотела
   узнать интересует интересно вопрос такое такой такая сколько скольки нужна нужен нужны после перед самый самая самое
   and the of to is are in for on
@@ -772,7 +774,33 @@ export const ASSISTANT_SUGGESTIONS = [
   'Как выбрать агентство?',
 ];
 
-const CONTACT_LINK = { to: '/apply', label: 'Задать вопрос команде' };
+// Готовые ответы: быстрые кнопки, приветствие/благодарность/прощание и служебные карточки
+// (связь с командой, контакты NNATO, «кто ты»). Они всегда отдаются как есть, без языковой модели.
+// Остальные вопросы при подключённом сервере чата получают сгенерированный ответ, который
+// опирается на материалы сайта; без сервера — локальный ответ по сайту, как раньше.
+const READY_ENTRY_IDS = new Set(['greeting', 'thanks', 'bye', 'contact', 'org-details', 'assistant']);
+const SUGGESTION_SET = new Set(ASSISTANT_SUGGESTIONS.map((q) => normalizeText(q)));
+
+/** Пишет ли пользователь по-русски (готовые ответы и тексты сайта — на русском). */
+export function isRussian(question) {
+  const text = String(question ?? '');
+  if (/[әғқңөұүһі]/i.test(text)) return false; // казахские буквы
+  const cyr = (text.match(/[а-яё]/gi) ?? []).length;
+  const lat = (text.match(/[a-z]/gi) ?? []).length;
+  return cyr > 0 && cyr >= lat;
+}
+
+/**
+ * Совпадает ли вопрос с готовым ответом.
+ * @param {string} question
+ * @param {{ entryId: string|null }} answer результат findAnswer
+ */
+export function isReadyAnswer(question, answer) {
+  const normalized = normalizeText(question);
+  if (!normalized) return true;
+  if (SUGGESTION_SET.has(normalized)) return true;
+  return isRussian(question) && READY_ENTRY_IDS.has(answer?.entryId);
+}
 
 /**
  * Ответ на вопрос по базе знаний.
@@ -802,6 +830,9 @@ export function findAnswer(question, index) {
   const confident = Boolean(best) && best.strong && best.coverage >= 0.5;
 
   if (!confident) {
+    // Прямой карточки нет — собираем ответ из фрагментов разных разделов сайта.
+    const composed = composeAnswer(question, index);
+    if (composed) return composed;
     const near = ranked.filter((r) => r.hit && r.entry.link).slice(0, 2).map((r) => r.entry.link);
     return {
       text: para(
@@ -818,9 +849,139 @@ export function findAnswer(question, index) {
     };
   }
 
-  const links = [best.entry.link];
+  // К основной карточке добавляем то, что по этому вопросу есть в других разделах сайта.
+  const scope = { excludeId: best.entry.id, excludeText: best.entry.text, max: 3 };
+  let extra = collectFragments(question, index, scope);
+  // Короткий вопрос из одного значимого слова: берём карточки, которые посвящены этому слову.
+  if (extra.length === 0) extra = collectFragments(question, index, { ...scope, minHits: 1, exactOnly: true, strongOnly: true, minKnownShare: 0.99 });
+  const links = [best.entry.link, ...extra.map((g) => g.entry.link)];
   if (second && second.strong && second.score >= best.score * 0.6) links.push(second.entry.link);
-  return { text: best.entry.text, links: dedupeLinks(links), matched: true, entryId: best.entry.id, topic: best.entry.title };
+  return {
+    text: extra.length ? para(best.entry.text, 'Ещё по теме из других разделов сайта:', ...fragmentBlocks(extra)) : best.entry.text,
+    links: dedupeLinks(links).slice(0, 3),
+    matched: true,
+    entryId: best.entry.id,
+    topic: best.entry.title,
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Ответ, собранный из фрагментов всех разделов                         */
+/* ------------------------------------------------------------------ */
+
+const FRAGMENT_MIN = 25;
+const FRAGMENT_MAX = 6;
+const FRAGMENT_PER_ENTRY = 3;
+const FRAGMENT_COVERAGE = 0.6;
+const FRAGMENT_MIN_HITS = 2; // значимых слов вопроса во фрагменте — одно совпадение слишком часто случайно
+const FRAGMENT_PREFIX_MIN = 5;
+const SKIP_ENTRIES = new Set(['assistant', 'org-details']);
+
+/** Карточка → отдельные предложения и пункты списка. */
+function splitFragments(text) {
+  return text
+    .split('\n')
+    .map((line) => line.replace(/^•\s*/, '').trim())
+    .flatMap((line) => line.split(/(?<=[.!?])\s+(?=[А-ЯA-Z«])/))
+    .map((line) => line.trim())
+    .filter((line) => line.length >= FRAGMENT_MIN && !/^(…и ещё|Тема:)/.test(line) && !/:$/.test(line));
+}
+
+/**
+ * Ищет по всем карточкам отдельные предложения, которые покрывают слова вопроса.
+ * Возвращает группы { entry, fragments[] } в порядке значимости.
+ * exactOnly — не считать совпадения по началу слова (строже, для одиночных совпадений).
+ */
+function collectFragments(question, index, { excludeId = null, excludeText = '', minHits = FRAGMENT_MIN_HITS, exactOnly = false, max = FRAGMENT_MAX, minKnownShare = 0, strongOnly = false } = {}) {
+  const tokens = [...new Set(tokenize(question, { fromVisitor: true }))];
+  if (tokens.length === 0) return [];
+
+  const importance = new Map(tokens.map((token) => {
+    const idf = index.idf.get(token) ?? index.maxIdf;
+    return [token, isWeak(token) ? idf * WEAK_FACTOR : idf];
+  }));
+  // Покрытие считаем по словам, которые вообще встречаются на сайте: незнакомое слово
+  // («магистратура», «бар») не должно обнулять ответ, если остальная часть вопроса — по теме.
+  const vocabulary = [...index.idf.keys()];
+  const known = tokens.filter((t) => index.idf.has(t) ||
+    (!exactOnly && t.length >= FRAGMENT_PREFIX_MIN && vocabulary.some((v) => v.length >= FRAGMENT_PREFIX_MIN && prefixMatch(v, t))));
+  const total = known.reduce((sum, t) => sum + importance.get(t), 0);
+  if (!total) return [];
+  // Если большая часть вопроса — слова, которых на сайте нет, вопрос не по теме сайта.
+  const all = tokens.reduce((sum, t) => sum + importance.get(t), 0);
+  if (total / all < minKnownShare) return [];
+
+  const scored = [];
+  for (const doc of index.docs) {
+    const { entry } = doc;
+    if (SKIP_ENTRIES.has(entry.id) || entry.id === excludeId) continue;
+    // strongOnly: карточка должна быть именно об этом — слово вопроса есть в её заголовке или ключевых словах.
+    if (strongOnly && !tokens.some((t) => !isWeak(t) && doc.strong.has(t))) continue;
+    const titleTokens = new Set(tokenize(entry.title));
+    splitFragments(entry.text).forEach((fragment, position) => {
+      if (excludeText.includes(fragment)) return;
+      const fragmentTokens = new Set(exactOnly ? tokenize(fragment) : [...tokenize(fragment), ...titleTokens]);
+      let covered = 0;
+      let hits = 0;
+      for (const token of tokens) {
+        const hit = fragmentTokens.has(token) ||
+          (!exactOnly && token.length >= FRAGMENT_PREFIX_MIN &&
+            [...fragmentTokens].some((t) => t.length >= FRAGMENT_PREFIX_MIN && prefixMatch(t, token)));
+        if (!hit) continue;
+        covered += importance.get(token);
+        if (!isWeak(token)) hits += 1;
+      }
+      if (hits < minHits || covered / total < FRAGMENT_COVERAGE) return;
+      scored.push({ entry, fragment, position, score: covered });
+    });
+  }
+
+  scored.sort((x, y) => y.score - x.score);
+  const groups = new Map();
+  const seen = new Set();
+  let count = 0;
+  for (const item of scored) {
+    if (count >= max) break;
+    if (seen.has(item.fragment)) continue;
+    const group = groups.get(item.entry.id) ?? { entry: item.entry, items: [] };
+    if (group.items.length >= FRAGMENT_PER_ENTRY) continue;
+    seen.add(item.fragment);
+    group.items.push(item);
+    groups.set(item.entry.id, group);
+    count += 1;
+  }
+  // Внутри группы — порядок как в исходной карточке.
+  return [...groups.values()].map(({ entry, items }) => ({
+    entry,
+    fragments: items.sort((x, y) => x.position - y.position).map((i) => i.fragment),
+  }));
+}
+
+const fragmentBlocks = (groups) => groups.map(({ entry, fragments }) => `${entry.title}:
+${bullets(fragments)}`);
+
+/**
+ * Если одной подходящей карточки нет, собирает ответ из фрагментов разных разделов сайта.
+ * Сначала берёт фрагменты, где совпали минимум два значимых слова вопроса; если таких нет —
+ * одно точное совпадение, но только когда вопрос в основном состоит из слов, которые есть на сайте.
+ * Возвращает null, если по теме на сайте ничего нет.
+ */
+export function composeAnswer(question, index) {
+  let groups = collectFragments(question, index);
+  // Запасной вариант: одно точное совпадение — только если вопрос в основном из слов сайта.
+  if (groups.length === 0) groups = collectFragments(question, index, { minHits: 1, exactOnly: true, max: 4, minKnownShare: 0.5 });
+  if (groups.length === 0) return null;
+  return {
+    text: para(
+      'Отдельного ответа на этот вопрос на сайте нет, поэтому собрал из разных разделов то, что относится к теме:',
+      ...fragmentBlocks(groups),
+      'Это общая информация с сайта — для вашего случая сверяйтесь с договором и спонсором.',
+    ),
+    links: dedupeLinks(groups.map((g) => g.entry.link).slice(0, 3)),
+    matched: true,
+    entryId: 'composed',
+    topic: 'Собрано из нескольких разделов',
+  };
 }
 
 function dedupeLinks(links) {
@@ -837,4 +998,15 @@ export function selectContext(question, index, limit = 6) {
   return rankEntries(question, index)
     .slice(0, limit)
     .map(({ entry }) => ({ title: entry.title, text: entry.text, link: entry.link }));
+}
+
+/**
+ * Все материалы сайта одним текстом — главный источник для языковой модели на сервере чата.
+ * Служебные карточки (о самом помощнике) не включаются.
+ */
+export function buildSiteDigest(entries) {
+  return entries
+    .filter((entry) => entry.id !== 'assistant')
+    .map((entry) => `## ${entry.title}${entry.link ? ` (раздел сайта: ${entry.link.to})` : ''}\n${entry.text}`)
+    .join('\n\n');
 }

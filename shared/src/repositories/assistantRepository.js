@@ -1,4 +1,5 @@
-import { buildKnowledgeBase, createIndex, findAnswer, selectContext } from '../services/assistant.js';
+import { buildKnowledgeBase, createIndex, findAnswer, selectContext, isReadyAnswer } from '../services/assistant.js';
+import { needsTeam, HANDOFF_TEXT, CONTACT_LINK } from '../services/handoff.js';
 
 const CONTENT_LOADERS = {
   program: 'getProgram',
@@ -26,23 +27,33 @@ function sanitizeLinks(links) {
     .map((l) => ({ to: l.to, label: l.label.slice(0, 80) }));
 }
 
+// Предложить связаться с командой: та же кнопка «Задать вопрос команде» (форма заявки), что и раньше.
+function withTeamLink(links) {
+  if (links.some((l) => l.to === CONTACT_LINK.to)) return links;
+  return [CONTACT_LINK, ...links].slice(0, 3);
+}
+
 /**
  * Ответы помощника.
  *
- * Без endpoint (по умолчанию) ответ подбирается прямо в браузере из материалов сайта:
- * вопрос никуда не отправляется и нигде не сохраняется.
+ * Порядок:
+ * 1. Готовый ответ (быстрые кнопки, приветствие, связь с командой и т. п. — см. isReadyAnswer)
+ *    отдаётся как есть, прямо из браузера.
+ * 2. Иначе, если задан endpoint, вопрос уходит на сервер чата с языковой моделью
+ *    (server/ в корне проекта): модель отвечает по материалам сайта, при необходимости
+ *    ищет на официальных сайтах программы J-1 и не выдумывает цены, даты и условия.
+ *      POST {endpoint}
+ *      { question, history: [{ role: 'user'|'assistant', text }], context: [{ title, text, link }] }
+ *      → { answer: string, links?: [{ to, label }], handoff?: boolean }
+ *    handoff: true — вопрос требует сотрудника; к ответу добавляется кнопка связи с командой.
+ * 3. Без endpoint или при сбое сервера — локальный ответ по материалам сайта, как раньше.
  *
- * С endpoint вопрос уходит на ваш сервер с языковой моделью:
- *   POST {endpoint}
- *   { question, history: [{ role: 'user'|'assistant', text }], context: [{ title, text, link }] }
- *   → { answer: string, links?: [{ to, label }] }
- * context — карточки сайта, ближайшие к вопросу: модель должна отвечать только по ним.
- * Если сервер недоступен или ответил ошибкой, используется локальный ответ.
+ * Ключ API хранится только на сервере; браузер его не знает.
  *
  * @param {{ loadContent: () => Promise<object>, endpoint?: string|null, fetchImpl?: typeof fetch, delayMs?: number, timeoutMs?: number }} config
  */
 export function createAssistantRepository(config) {
-  const { loadContent, endpoint = null, fetchImpl = globalThis.fetch, delayMs = 650, timeoutMs = 20000 } = config;
+  const { loadContent, endpoint = null, fetchImpl = globalThis.fetch, delayMs = 650, timeoutMs = 60000 } = config;
 
   let indexPromise = null;
   const getIndex = () => {
@@ -70,7 +81,9 @@ export function createAssistantRepository(config) {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
       if (typeof data?.answer !== 'string' || !data.answer.trim()) throw new Error('Пустой ответ сервера');
-      return { text: data.answer.trim(), links: sanitizeLinks(data.links), matched: true, topic: null, mode: 'api' };
+      const handoff = data.handoff === true || needsTeam(question);
+      const links = sanitizeLinks(data.links);
+      return { text: data.answer.trim(), links: handoff ? withTeamLink(links) : links, matched: true, topic: null, mode: 'api' };
     } finally {
       if (timer) clearTimeout(timer);
     }
@@ -87,7 +100,9 @@ export function createAssistantRepository(config) {
      */
     async ask(question, history = []) {
       const index = await getIndex();
-      if (endpoint) {
+      const local = findAnswer(question, index);
+      const ready = isReadyAnswer(question, local);
+      if (endpoint && !ready) {
         try {
           return await askRemote(question, history.slice(-10), index);
         } catch {
@@ -97,7 +112,13 @@ export function createAssistantRepository(config) {
         // Короткая пауза, чтобы ответ не «выстреливал» мгновенно и был виден индикатор набора.
         await new Promise((resolve) => setTimeout(resolve, delayMs));
       }
-      const { text, links, matched, topic } = findAnswer(question, index);
+      const { matched, topic } = local;
+      let { text, links } = local;
+      // Вопрос про оплату, договор, личную ситуацию и т. п. — после ответа предлагаем команду.
+      if (!ready && needsTeam(question)) {
+        if (!text.includes(HANDOFF_TEXT)) text = `${text}\n\n${HANDOFF_TEXT}`;
+        links = withTeamLink(links);
+      }
       return { text, links, matched, topic: topic ?? null, mode: 'local' };
     },
   };
