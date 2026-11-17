@@ -1,0 +1,30 @@
+# Render Blueprint: сервер чата-помощника (server/).
+# Render → New → Blueprint → выбрать этот репозиторий. Значения с sync: false
+# Render попросит ввести при создании — ключ API хранится только там, не в репозитории.
+services:
+  - type: web
+    name: nnato-chat
+    runtime: node
+    plan: free
+    # Корень — весь репозиторий: сервер читает материалы сайта из shared/.
+    buildCommand: cd server && npm ci
+    startCommand: node server/src/index.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      # Достаточно одного ключа: GEMINI_API_KEY (бесплатный) или ANTHROPIC_API_KEY.
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite,gemini-3.1-flash-lite
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false # адрес сайта, например https://username.github.io
+      - key: CHAT_MODEL
+        value: claude-opus-5-5
+      - key: CHAT_EFFORT
+        value: low
+      - key: RATE_LIMIT_PER_10_MIN
+        value: 20

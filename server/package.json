@@ -12,6 +12,7 @@
     "test": "node --test tests/chat.test.js"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^1.10.0"
+    "@anthropic-ai/sdk": "^1.10.0",
+    "@google/genai": "^3.4.0"
   }
 }

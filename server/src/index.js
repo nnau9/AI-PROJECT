@@ -2,10 +2,10 @@
 //   POST /api/chat  { question, history?: [{ role, text }] } → { answer, links, handoff }
 //   GET  /health    → { ok: true }
 // Настройки — переменные окружения (см. server/.env.example). Ключ API только здесь, не в коде сайта.
+// Модель: Google Gemini (GEMINI_API_KEY, бесплатный ключ) или Anthropic Claude (ANTHROPIC_API_KEY).
 
 import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
-import Anthropic from '@anthropic-ai/sdk';
 
 import { createChat, loadSiteContent, DEFAULT_SEARCH_DOMAINS } from './chat.js';
 
@@ -16,22 +16,52 @@ try {
 }
 
 const env = process.env;
-if (!env.ANTHROPIC_API_KEY) {
-  console.error('Не задан ANTHROPIC_API_KEY (server/.env или переменные окружения хостинга).');
+const list = (value) => (value ? value.split(',').map((s) => s.trim()).filter(Boolean) : null);
+
+// Какую модель использовать: LLM_PROVIDER, а если не задан — ту, для которой есть ключ (Gemini первым).
+const providerName = (env.LLM_PROVIDER || (env.GEMINI_API_KEY ? 'gemini' : env.ANTHROPIC_API_KEY ? 'anthropic' : '')).toLowerCase();
+
+async function createProvider() {
+  if (providerName === 'gemini') {
+    if (!env.GEMINI_API_KEY) throw new Error('Не задан GEMINI_API_KEY');
+    const { GoogleGenAI } = await import('@google/genai');
+    const { createGeminiProvider, DEFAULT_GEMINI_MODELS } = await import('./providers/gemini.js');
+    return createGeminiProvider({
+      client: new GoogleGenAI({ apiKey: env.GEMINI_API_KEY, httpOptions: { timeout: 55_000 } }),
+      models: list(env.GEMINI_MODEL) ?? DEFAULT_GEMINI_MODELS,
+      search: env.GEMINI_SEARCH || 'auto',
+    });
+  }
+  if (providerName === 'anthropic') {
+    if (!env.ANTHROPIC_API_KEY) throw new Error('Не задан ANTHROPIC_API_KEY');
+    const { default: Anthropic } = await import('@anthropic-ai/sdk');
+    const { createAnthropicProvider } = await import('./providers/anthropic.js');
+    return createAnthropicProvider({
+      client: new Anthropic({ timeout: 55_000, maxRetries: 1 }),
+      model: env.CHAT_MODEL || 'claude-opus-5-5',
+      effort: env.CHAT_EFFORT || 'low',
+      searchDomains: list(env.SEARCH_DOMAINS) ?? DEFAULT_SEARCH_DOMAINS,
+    });
+  }
+  throw new Error('Не задан ключ модели: впишите GEMINI_API_KEY (или ANTHROPIC_API_KEY) в server/.env');
+}
+
+let provider;
+try {
+  provider = await createProvider();
+} catch (error) {
+  console.error(error.message);
   process.exit(1);
 }
 
 const PORT = Number(env.PORT) || 8787;
-const ALLOWED_ORIGINS = (env.ALLOWED_ORIGINS || '*').split(',').map((s) => s.trim()).filter(Boolean);
+const ALLOWED_ORIGINS = list(env.ALLOWED_ORIGINS) ?? ['*'];
 const RATE_LIMIT = Number(env.RATE_LIMIT_PER_10_MIN) || 20;
 const MAX_BODY = 32 * 1024;
 
 const chat = createChat({
-  client: new Anthropic({ timeout: 55_000, maxRetries: 1 }),
+  provider,
   content: loadSiteContent(fileURLToPath(new URL('../../shared/data', import.meta.url))),
-  model: env.CHAT_MODEL || 'claude-opus-5-5',
-  effort: env.CHAT_EFFORT || 'low',
-  searchDomains: env.SEARCH_DOMAINS ? env.SEARCH_DOMAINS.split(',').map((s) => s.trim()).filter(Boolean) : DEFAULT_SEARCH_DOMAINS,
 });
 
 // Простое ограничение частоты по IP — чтобы чужие скрипты не тратили ключ.
@@ -96,13 +126,11 @@ const server = createServer(async (req, res) => {
     // context из браузера не используется: сервер сам берёт материалы сайта из shared/data.
     return send(res, 200, await chat.answer({ question, history }), cors);
   } catch (error) {
-    if (error instanceof Anthropic.RateLimitError) console.error('Лимит API Anthropic:', error.message);
-    else if (error instanceof Anthropic.AuthenticationError) console.error('Неверный ANTHROPIC_API_KEY');
-    else if (error instanceof Anthropic.APIError) console.error(`Ошибка API ${error.status}:`, error.message);
-    else console.error('Ошибка чата:', error);
+    // 401/403 — неверный ключ, 429 — исчерпан лимит (на бесплатном тарифе Gemini — дневной).
+    console.error(`Ошибка модели ${chat.provider}${error.status ? ` (HTTP ${error.status})` : ''}:`, error.message);
     // Браузер в этом случае ответит локально по материалам сайта.
     return send(res, 502, { error: 'Помощник временно недоступен' }, cors);
   }
 });
 
-server.listen(PORT, () => console.log(`Чат-помощник NNATO: http://localhost:${PORT}/api/chat`));
+server.listen(PORT, () => console.log(`Чат-помощник NNATO (${chat.provider}): http://localhost:${PORT}/api/chat`));

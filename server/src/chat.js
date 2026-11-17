@@ -1,6 +1,6 @@
-// Генерация ответов помощника: Claude отвечает по материалам сайта, а если их не хватает —
-// ищет на официальных сайтах программы J-1. Ключ API читается SDK из переменной окружения
-// ANTHROPIC_API_KEY на сервере и в браузер не попадает.
+// Генерация ответов помощника: модель отвечает по материалам сайта, а если их не хватает —
+// ищет на официальных сайтах программы J-1. Сама модель подключается через провайдера
+// (providers/gemini.js или providers/anthropic.js); ключ API живёт только на сервере.
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -13,7 +13,7 @@ import {
 } from '../../shared/src/services/assistant.js';
 import { needsTeam } from '../../shared/src/services/handoff.js';
 
-/** Сайты, по которым разрешён поиск в интернете (поддомены входят автоматически). */
+/** Сайты, по которым разрешён поиск (Claude: жёсткий фильтр; Gemini: только через правила). */
 export const DEFAULT_SEARCH_DOMAINS = [
   'j1visa.state.gov', // официальный сайт программы J-1 (BridgeUSA)
   'travel.state.gov', // визы США, DS-160
@@ -50,7 +50,7 @@ const RULES = `Ты — «косатка», ИИ-помощник сайта NNA
 
 ИСТОЧНИКИ (строго по порядку)
 1. Материалы сайта в блоке <site> — главный источник, всегда в приоритете.
-2. Если на сайте ответа нет или его не хватает — поиск web_search по официальным источникам: j1visa.state.gov, сайты посольства США, travel.state.gov, сайты спонсоров программы. Ищи только по теме вопроса.
+2. Если на сайте ответа нет или его не хватает — поиск в интернете. Опирайся только на надёжные источники: j1visa.state.gov, travel.state.gov, сайты посольства США (kz.usembassy.gov), ice.gov, сайты спонсоров программы (CIEE, InterExchange, Alliance Abroad и др.). Форумы, блоги, соцсети и сайты агентств для фактов не используй. Ищи только по теме вопроса.
 3. Если сведения из интернета расходятся с сайтом, верен сайт. Упомяни, что на сайте указано так.
 
 ТЕМЫ
@@ -78,6 +78,21 @@ const HANDOFF_HINT =
   TEAM_MARKER +
   ' последней строкой.';
 
+// Материалы сайта на русском и тянут модель к русскому — поэтому язык вопроса подсказываем явно.
+const LANGUAGE_HINTS = {
+  en: 'The user writes in English. Answer entirely in English (translate the site information and the phrase about the team).',
+  kk: 'Пользователь пишет по-казахски. Отвечай полностью на казахском языке.',
+};
+
+/** Язык вопроса: kk (казахские буквы), en (латиница) или ru. */
+export function detectLanguage(text) {
+  const value = String(text ?? '');
+  if (/[әғқңөұүһі]/i.test(value)) return 'kk';
+  const cyr = (value.match(/[а-яё]/gi) ?? []).length;
+  const lat = (value.match(/[a-z]/gi) ?? []).length;
+  return lat > cyr ? 'en' : 'ru';
+}
+
 const MAX_TEXT = 2000;
 const MAX_HISTORY = 10;
 
@@ -98,18 +113,9 @@ export function toMessages(history = []) {
   return messages;
 }
 
-/** Текст итогового ответа: текстовые блоки после последнего поиска. */
-export function extractAnswer(content) {
-  let start = 0;
-  content.forEach((block, i) => {
-    if (block.type === 'server_tool_use' || block.type.endsWith('_tool_result')) start = i + 1;
-  });
-  const text = content
-    .slice(start)
-    .filter((block) => block.type === 'text')
-    .map((block) => block.text)
-    .join('')
-    .trim();
+/** Убирает служебную метку и Markdown-жирный; handoff — модель попросила позвать команду. */
+export function cleanAnswer(raw) {
+  const text = String(raw ?? '').trim();
   const handoff = text.includes(TEAM_MARKER);
   const clean = text
     .replaceAll(TEAM_MARKER, '')
@@ -120,24 +126,20 @@ export function extractAnswer(content) {
 }
 
 /**
- * @param {{
- *   client: { beta: { messages: { create: Function } } },
- *   content: object,
- *   model?: string,
- *   effort?: 'low'|'medium'|'high',
- *   searchDomains?: string[],
- *   maxSearches?: number,
- * }} options
+ * @typedef {{ role: 'user'|'assistant', content: string }} ChatMessage
+ * @typedef {{
+ *   name: string,
+ *   generate: (input: { rules: string, site: string, messages: ChatMessage[], hint: string|null }) => Promise<string>,
+ * }} Provider  generate возвращает текст ответа или бросает ошибку (отказ, пустой ответ, сбой API).
  */
-export function createChat({ client, content, model = 'claude-opus-5-5', effort = 'low', searchDomains = DEFAULT_SEARCH_DOMAINS, maxSearches = 3 }) {
+
+/**
+ * @param {{ provider: Provider, content: object }} options
+ */
+export function createChat({ provider, content }) {
   const kb = buildKnowledgeBase(content);
   const index = createIndex(kb);
-  // Неизменная часть запроса (правила + весь сайт) кэшируется между вопросами.
-  const system = [
-    { type: 'text', text: RULES },
-    { type: 'text', text: `<site>\n${buildSiteDigest(kb)}\n</site>`, cache_control: { type: 'ephemeral' } },
-  ];
-  const tools = [{ type: 'web_search_20260209', name: 'web_search', max_uses: maxSearches, allowed_domains: searchDomains }];
+  const site = `<site>\n${buildSiteDigest(kb)}\n</site>`;
 
   /** Ссылки на разделы сайта, которые точно относятся к вопросу. */
   function siteLinks(question) {
@@ -150,37 +152,18 @@ export function createChat({ client, content, model = 'claude-opus-5-5', effort 
   }
 
   return {
+    provider: provider.name,
     /**
      * @param {{ question: string, history?: { role: string, text: string }[] }} input
      * @returns {Promise<{ answer: string, links: {to:string,label:string}[], handoff: boolean }>}
      */
     async answer({ question, history = [] }) {
       const hinted = needsTeam(question);
-      let messages = [...toMessages(history), { role: 'user', content: question.trim().slice(0, MAX_TEXT) }];
-      // Подсказка оператора — отдельным системным сообщением после вопроса, а не внутри текста пользователя.
-      if (hinted) messages.push({ role: 'system', content: HANDOFF_HINT });
-
-      let response;
-      // Долгий поиск может прийти с pause_turn — тогда продолжаем тот же ход.
-      for (let attempt = 0; attempt < 4; attempt += 1) {
-        response = await client.beta.messages.create({
-          model,
-          max_tokens: 16000,
-          output_config: { effort },
-          // Если модель отклонит запрос, сервер API сам повторит его на запасной модели.
-          betas: ['server-side-fallback-2026-07-01'],
-          fallbacks: 'default',
-          system,
-          tools,
-          messages,
-        });
-        if (response.stop_reason !== 'pause_turn') break;
-        messages = [...messages, { role: 'assistant', content: response.content }];
-      }
-
-      if (response.stop_reason === 'refusal') throw new Error('Модель отклонила запрос');
-      const { text, handoff } = extractAnswer(response.content);
-      if (!text) throw new Error(`Пустой ответ модели (stop_reason: ${response.stop_reason})`);
+      const messages = [...toMessages(history), { role: 'user', content: question.trim().slice(0, MAX_TEXT) }];
+      const hint = [hinted ? HANDOFF_HINT : null, LANGUAGE_HINTS[detectLanguage(question)]].filter(Boolean).join('\n') || null;
+      const raw = await provider.generate({ rules: RULES, site, messages, hint });
+      const { text, handoff } = cleanAnswer(raw);
+      if (!text) throw new Error(`Пустой ответ модели (${provider.name})`);
       return { answer: text.slice(0, 4000), links: siteLinks(question), handoff: handoff || hinted };
     },
   };
